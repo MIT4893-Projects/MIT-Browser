@@ -2,6 +2,7 @@
 Main Python file for Browser Window
 """
 
+import os
 import sys
 from PySide2 import (
     QtCore as QtC,
@@ -18,14 +19,18 @@ class Browser(QtWEW.QWebEngineView):
     Inherit:
         PySide2.QtWebEngineWidgets.QWebEngineView
     """
+    def __init__(self):
+        pass
 
 
 
 if __name__ == "__main__":
     app = QtW.QApplication(sys.argv)
 
-    web_view = QtWEW.QWebEngineView()
-    web_view.load(QtC.QUrl("./index.html"))
+    web_view = Browser()
+    web_view.load(QtC.QUrl.fromLocalFile(
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "index.html"))
+    ))
     web_view.show()
 
     app.exec_()
