@@ -1,0 +1,15 @@
+#urlbar {
+    border: 1px solid #222;
+    border-radius: 15px;
+    font-size: 13px;
+}
+
+#btn-next, #btn-back {
+    background-color: white;
+    border: 1px solid #222;
+    border-radius: 15px;
+}
+
+#url-frame {
+    background-color: gray;
+}
