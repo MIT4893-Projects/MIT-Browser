@@ -2,6 +2,7 @@
 Main Python file for Browser Window
 """
 
+import parser # pylint: disable=deprecated-module
 import os
 import sys
 from PySide2 import (
@@ -27,12 +28,15 @@ class Browser(QtW.QMainWindow):
             PySide2.QtWidgets.QFrame
         """
 
+        __last_url : str
         __button_back : QtW.QToolButton
         __button_next : QtW.QToolButton
         __lineedit_urlbar : QtW.QLineEdit
 
         def __init__(self):
             super().__init__()
+
+            self.last_url = ""
 
             self.setMinimumHeight(32)
             self.setObjectName("url-frame")
@@ -62,18 +66,29 @@ class Browser(QtW.QMainWindow):
             self.__lineedit_urlbar.setSizePolicy(
                 QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Expanding)
             self.__lineedit_urlbar.setTextMargins(10, 0, 0, 0)
-            self.__lineedit_urlbar.editingFinished.connect(self.go_to_site)
+            self.__lineedit_urlbar.returnPressed.connect(self.go_to_site)
             self.__lineedit_urlbar.setObjectName("urlbar")
             self.__lineedit_urlbar.setStyleSheet(STYLESHEET)
             self.layout().addWidget(self.__lineedit_urlbar)
 
         def go_to_site(self):
             """Load site when press ENTER or RETURN at __lineedit_urlbar"""
-            web_view.load(self.__lineedit_urlbar.text())
+            url = self.__lineedit_urlbar.text().strip()
+            if url == self.last_url:
+                return
+            if not parser.is_valid_url(url):
+                print(CONFIG["search-engine"][CONFIG["default-search-engine"]].format(url).replace(" ", "+"))
+                web_view.load(CONFIG["search-engine"][CONFIG["default-search-engine"]].format(url).replace(" ", "+"))
+                return
+            if not parser.have_URL_schema(url):
+                url = "http://" + url
+            print(url)
+            web_view.load(QtC.QUrl(url))
 
         def set_urlbar_text(self, text):
             """Set urlbar text when site changed"""
-            self.__lineedit_urlbar.setText(text)
+            self.__lineedit_urlbar.setText(text.strip())
+            self.last_url = text.strip()
 
     __webview : QtWEW.QWebEngineView
     __frame_main : QtW.QFrame
@@ -96,9 +111,7 @@ class Browser(QtW.QMainWindow):
         def update_window_title(_q=None):
             """Update the window title when the page load finished"""
             self.setWindowTitle(self.__webview.page().title())
-            print(_q)
-            if _q:
-                self.__urlbar.set_urlbar_text(_q.toString())
+            self.__urlbar.set_urlbar_text(self.__webview.page().url().toString())
 
         self.__webview.urlChanged.connect(update_window_title)
         self.__webview.loadFinished.connect(update_window_title)
@@ -115,9 +128,13 @@ class Browser(QtW.QMainWindow):
 
     def option(self):
         """Set options for main window"""
-        self.__webview.load(QtC.QUrl("https://bing.com"))
+        # Default URL when start browser
+        self.__webview.load(QtC.QUrl(CONFIG["homepage"]))
 
         self.show()
+
+    def load(self, url:QtC.QUrl):
+        self.__webview.load(url)
 
 
 
@@ -135,8 +152,8 @@ def get_absolute_path(path):
 
 
 if __name__ == "__main__":
-    with open("pyqt5.css", encoding="utf-8") as stylesheet_file:
-        STYLESHEET = stylesheet_file.read()
+    STYLESHEET = parser.get_stylesheet("pyqt5.css")
+    CONFIG = parser.get_config("config.json")
 
     app = QtW.QApplication(sys.argv)
 
