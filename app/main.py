@@ -2,12 +2,11 @@
 Main Python file for Browser Window
 """
 
-import parser # pylint: disable=deprecated-module
+import parser
 import os
 import sys
 from PySide2 import (
     QtCore as QtC,
-    QtGui as QtG,
     QtWidgets as QtW,
     QtWebEngineWidgets as QtWEW
 )
@@ -32,11 +31,13 @@ class Browser(QtW.QMainWindow):
         __button_back : QtW.QToolButton
         __button_next : QtW.QToolButton
         __lineedit_urlbar : QtW.QLineEdit
+        __parent_window : QtW.QMainWindow
 
-        def __init__(self):
+        def __init__(self, parent_window):
             super().__init__()
 
-            self.last_url = ""
+            self.__last_url = ""
+            self.__parent_window = parent_window
 
             self.setMinimumHeight(32)
             self.setObjectName("url-frame")
@@ -47,20 +48,21 @@ class Browser(QtW.QMainWindow):
             self.layout().setSpacing(1)
             self.setSizePolicy(QtW.QSizePolicy(QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Fixed))
 
-            self.__button_next = QtW.QToolButton()
-            self.__button_back = QtW.QToolButton()
-            self.__button_next.setIcon(QtG.QIcon('./assets/icons/next-arrow.png'))
-            self.__button_back.setIcon(QtG.QIcon('./assets/icons/back-arrow.png'))
-            self.__button_back.setMinimumWidth(30)
-            self.__button_next.setMinimumWidth(30)
-            self.__button_back.setSizePolicy(QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Minimum)
-            self.__button_next.setSizePolicy(QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Minimum)
-            self.__button_back.setObjectName("btn-back")
-            self.__button_next.setObjectName("btn-next")
-            self.__button_back.setStyleSheet(STYLESHEET)
-            self.__button_next.setStyleSheet(STYLESHEET)
-            self.layout().addWidget(self.__button_back)
-            self.layout().addWidget(self.__button_next)
+            # Create and configure buttons
+            self.__button_next = QtW.QToolButton(clicked=self.forward)
+            self.__button_back = QtW.QToolButton(clicked=self.back)
+            self.__button_reload = QtW.QToolButton()
+            for button, name, clicked in (
+                (self.__button_back, "btn-back", self.forward),
+                (self.__button_next, "btn-next", self.back),
+                (self.__button_reload, "btn-reload", self.reload)
+            ):
+                button = QtW.QToolButton(clicked=clicked)
+                button.setObjectName(name)
+                button.setMinimumWidth(30)
+                button.setSizePolicy(QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
+                button.setStyleSheet(STYLESHEET)
+                self.layout().addWidget(button)
 
             self.__lineedit_urlbar = QtW.QLineEdit()
             self.__lineedit_urlbar.setSizePolicy(
@@ -73,23 +75,30 @@ class Browser(QtW.QMainWindow):
 
         def go_to_site(self):
             """Load site when press ENTER or RETURN at __lineedit_urlbar"""
-            url = self.__lineedit_urlbar.text().strip()
-            if url == self.last_url:
-                return
-            if not parser.is_valid_url(url):
-                print(CONFIG["search-engine"][CONFIG["default-search-engine"]].format(url).replace(" ", "+"))
-                web_view.load(CONFIG["search-engine"][CONFIG["default-search-engine"]].format(url).replace(" ", "+"))
-                return
-            if not parser.have_URL_schema(url):
-                url = "http://" + url
-            print(url)
-            web_view.load(QtC.QUrl(url))
+            self.__parent_window.load(self.__lineedit_urlbar.text())
 
         def set_urlbar_text(self, text):
             """Set urlbar text when site changed"""
             self.__lineedit_urlbar.setText(text.strip())
-            self.last_url = text.strip()
+            self.__last_url = text.strip()
 
+        def get_last_url(self):
+            """Return self.__last_url"""
+            return self.__last_url
+
+        def back(self):
+            """Call parent window to go to the last site"""
+            self.__parent_window.back()
+
+        def forward(self):
+            """Call parent window to go to the next site"""
+            self.__parent_window.next()
+
+        def reload(self):
+            """Call parent window to reload the current site"""
+            self.__parent_window.reload()
+
+    # Attrs:
     __webview : QtWEW.QWebEngineView
     __frame_main : QtW.QFrame
     __urlbar : URLBar
@@ -99,7 +108,7 @@ class Browser(QtW.QMainWindow):
 
         self.__webview = QtWEW.QWebEngineView()
         self.__frame_main = QtW.QFrame()
-        self.__urlbar = self.URLBar()
+        self.__urlbar = self.URLBar(self)
 
         self.connect_methods()
         self.load_ui()
@@ -118,6 +127,7 @@ class Browser(QtW.QMainWindow):
 
     def load_ui(self):
         """Create and add widgets to main window"""
+
         self.__frame_main.setLayout(QtW.QGridLayout())
         self.__frame_main.layout().setSpacing(0)
         self.__frame_main.layout().setMargin(0)
@@ -128,13 +138,45 @@ class Browser(QtW.QMainWindow):
 
     def option(self):
         """Set options for main window"""
+
         # Default URL when start browser
         self.__webview.load(QtC.QUrl(CONFIG["homepage"]))
 
         self.show()
 
-    def load(self, url:QtC.QUrl):
-        self.__webview.load(url)
+    def load(self, url:str):
+        """Load site url
+
+        Args:
+            url (str): site's URL to load
+        """
+
+        # if don't have any changes on URL bar
+        if url == self.__urlbar.get_last_url():
+            return
+
+        # if URL not valid, call search engine
+        if not parser.is_valid_url(url):
+            web_view.load(
+                CONFIG["search-engine"][CONFIG["default-search-engine"]]
+                    .format(url).replace(" ", "+"))
+            return
+
+        url = parser.add_url_schema(url)
+
+        self.__webview.load(QtC.QUrl(url))
+
+    def back(self):
+        """Go back to last page"""
+        self.__webview.back()
+
+    def forward(self):
+        """Go to the next page"""
+        self.__webview.next()
+
+    def reload(self):
+        """Reload the current page"""
+        self.__webview.reload()
 
 
 
