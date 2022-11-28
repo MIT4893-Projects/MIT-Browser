@@ -3,6 +3,8 @@
     "default-search-engine": "bing",
     "search-engine": {
         "google": "https://google.com/search?q={}",
-        "bing": "https://bing.com/search?q={}"
+        "bing": "https://bing.com/search?q={}",
+        "yahoo": "https://search.yahoo.com/search?q={}",
+        "duckduckgo": "https://duckduckgo.com/?q={}"
     }
 }
