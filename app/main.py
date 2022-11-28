@@ -30,6 +30,7 @@ class Browser(QtW.QMainWindow):
         __last_url : str
         __button_back : QtW.QToolButton
         __button_next : QtW.QToolButton
+        __button_reload : QtW.QToolButton
         __lineedit_urlbar : QtW.QLineEdit
         __parent_window : QtW.QMainWindow
 
@@ -49,21 +50,22 @@ class Browser(QtW.QMainWindow):
             self.setSizePolicy(QtW.QSizePolicy(QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Fixed))
 
             # Create and configure buttons
-            self.__button_next = QtW.QToolButton(clicked=self.forward)
-            self.__button_back = QtW.QToolButton(clicked=self.back)
+            self.__button_back = QtW.QToolButton()
+            self.__button_next = QtW.QToolButton()
             self.__button_reload = QtW.QToolButton()
             for button, name, clicked in (
                 (self.__button_back, "btn-back", self.forward),
                 (self.__button_next, "btn-next", self.back),
                 (self.__button_reload, "btn-reload", self.reload)
             ):
-                button = QtW.QToolButton(clicked=clicked)
+                button.clicked.connect(clicked)
                 button.setObjectName(name)
                 button.setMinimumWidth(30)
                 button.setSizePolicy(QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
                 button.setStyleSheet(STYLESHEET)
                 self.layout().addWidget(button)
 
+            # Create URL bar
             self.__lineedit_urlbar = QtW.QLineEdit()
             self.__lineedit_urlbar.setSizePolicy(
                 QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Expanding)
@@ -88,15 +90,15 @@ class Browser(QtW.QMainWindow):
 
         def back(self):
             """Call parent window to go to the last site"""
-            self.__parent_window.back()
+            self.__parent_window.webview().back()
 
         def forward(self):
             """Call parent window to go to the next site"""
-            self.__parent_window.next()
+            self.__parent_window.webview().next()
 
         def reload(self):
             """Call parent window to reload the current site"""
-            self.__parent_window.reload()
+            self.__parent_window.webview().reload()
 
     # Attrs:
     __webview : QtWEW.QWebEngineView
@@ -166,17 +168,9 @@ class Browser(QtW.QMainWindow):
 
         self.__webview.load(QtC.QUrl(url))
 
-    def back(self):
-        """Go back to last page"""
-        self.__webview.back()
-
-    def forward(self):
-        """Go to the next page"""
-        self.__webview.next()
-
-    def reload(self):
-        """Reload the current page"""
-        self.__webview.reload()
+    def webview(self):
+        """Return self.__webview"""
+        return self.__webview
 
 
 
