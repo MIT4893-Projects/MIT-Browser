@@ -4,10 +4,22 @@
     font-size: 13px;
 }
 
-#btn-next, #btn-back {
+#btn-next, #btn-back, #btn-reload {
     background-color: white;
     border: 1px solid #222;
     border-radius: 15px;
+}
+
+#btn-next {
+    qproperty-icon: url("./assets/icons/next-arrow.png");
+}
+
+#btn-back {
+    qproperty-icon: url("./assets/icons/back-arrow.png");
+}
+
+#btn-reload {
+    qproperty-icon: url("./assets/icons/reload.png");
 }
 
 #url-frame {
