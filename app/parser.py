@@ -23,21 +23,29 @@ def get_stylesheet(file_path) -> dict:
     Returns:
         str: string store stylesheet
     """
-    with open("pyqt5.css", encoding="utf-8") as style_file:
+    with open(file_path, encoding="utf-8") as style_file:
         return style_file.read()
 
-def have_URL_schema(url):
-    ""
+def add_url_schema(url) -> str:
+    """Add URL schema if url didn't have schema"""
     schemas = (
         "http://",
         "https://"
     )
     for schema in schemas:
         if url.startswith(schema):
-            return True
-    return False
+            return url
+    return "http://" + url
 
 def is_valid_url(url):
+    """Check URL without schema is valid
+
+    Args:
+        url (str): input URL
+
+    Returns:
+        bool: check url is valid
+    """
     regex = re.compile(
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
         r'localhost|'  # localhost...
