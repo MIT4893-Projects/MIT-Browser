@@ -1,0 +1,26 @@
+# created by virtualenv automatically
+
+# Python Virtual Enviroment
+Lib/
+Scripts/
+pyvenv.cfg
+
+# PyQt Designer .ui design files
+design/
+
+# VS Code settings
+.vscode/
+
+# Python cache files
+*.pyc
+__pycache__/
+
+# Pylint config
+.pylintrc
+
+# VS Code tempCodeRunner file
+tempCodeRunner.*
+
+# PyInstaller options
+main.spec
+build/
