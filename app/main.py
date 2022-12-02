@@ -188,7 +188,7 @@ def get_absolute_path(path):
 
 
 if __name__ == "__main__":
-    STYLESHEET = parser.get_stylesheet("pyqt5.css")
+    STYLESHEET = parser.get_stylesheet("style.css")
     CONFIG = parser.get_config("config.json")
 
     app = QtW.QApplication(sys.argv)
