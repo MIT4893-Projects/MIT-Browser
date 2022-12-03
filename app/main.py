@@ -2,9 +2,10 @@
 Main Python file for Browser Window
 """
 
-import parser
 import os
 import sys
+import parse_files
+import parse_str
 from PySide2 import (
     QtCore as QtC,
     QtWidgets as QtW,
@@ -158,13 +159,13 @@ class Browser(QtW.QMainWindow):
             return
 
         # if URL not valid, call search engine
-        if not parser.is_valid_url(url):
+        if not parse_str.is_valid_url(url):
             web_view.load(
                 CONFIG["search-engine"][CONFIG["default-search-engine"]]
                     .format(url).replace(" ", "+"))
             return
 
-        url = parser.add_url_schema(url)
+        url = parse_str.add_url_schema(url)
 
         self.__webview.load(QtC.QUrl(url))
 
@@ -188,8 +189,8 @@ def get_absolute_path(path):
 
 
 if __name__ == "__main__":
-    STYLESHEET = parser.get_stylesheet("style.css")
-    CONFIG = parser.get_config("config.json")
+    STYLESHEET = parse_files.get_stylesheet("style.css")
+    CONFIG = parse_files.get_config("config.json")
 
     app = QtW.QApplication(sys.argv)
 
