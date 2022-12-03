@@ -1,3 +1,11 @@
+QTabWidget::pane {
+    border: 0;
+}
+
+QTabWidget::tab-bar {
+    background-color: #1E1D26;
+}
+
 #urlbar {
     border: 1px solid #222;
     border-radius: 15px;

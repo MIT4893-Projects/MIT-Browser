@@ -4,8 +4,10 @@ Main Python file for Browser Window
 
 import os
 import sys
-import parse_files
-import parse_str
+from parser import (
+    parse_files,
+    parse_str
+)
 from PySide2 import (
     QtCore as QtC,
     QtWidgets as QtW,
@@ -28,7 +30,7 @@ class Browser(QtW.QMainWindow):
             PySide2.QtWidgets.QFrame
         """
 
-        __last_url : str
+        # Attrs:
         __button_back : QtW.QToolButton
         __button_next : QtW.QToolButton
         __button_reload : QtW.QToolButton
@@ -38,7 +40,6 @@ class Browser(QtW.QMainWindow):
         def __init__(self, parent_window):
             super().__init__()
 
-            self.__last_url = ""
             self.__parent_window = parent_window
 
             self.setMinimumHeight(32)
@@ -83,11 +84,6 @@ class Browser(QtW.QMainWindow):
         def set_urlbar_text(self, text):
             """Set urlbar text when site changed"""
             self.__lineedit_urlbar.setText(text.strip())
-            self.__last_url = text.strip()
-
-        def get_last_url(self):
-            """Return self.__last_url"""
-            return self.__last_url
 
         def back(self):
             """Call parent window to go to the last site"""
@@ -144,7 +140,6 @@ class Browser(QtW.QMainWindow):
 
         # Default URL when start browser
         self.__webview.load(QtC.QUrl(CONFIG["homepage"]))
-
         self.show()
 
     def load(self, url:str):
@@ -153,10 +148,6 @@ class Browser(QtW.QMainWindow):
         Args:
             url (str): site's URL to load
         """
-
-        # if don't have any changes on URL bar
-        if url == self.__urlbar.get_last_url():
-            return
 
         # if URL not valid, call search engine
         if not parse_str.is_valid_url(url):
@@ -187,10 +178,15 @@ def get_absolute_path(path):
     """
     return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
 
+CONFIG : dict[str, str]
+STYLESHEET : str
 
 if __name__ == "__main__":
-    STYLESHEET = parse_files.get_stylesheet("style.css")
-    CONFIG = parse_files.get_config("config.json")
+    parser = parse_files.Parser()
+    parser.config = "./config.json"
+    parser.stylesheet = "./style.qss"
+    CONFIG = parser.config
+    STYLESHEET = parser.stylesheet
 
     app = QtW.QApplication(sys.argv)
 
