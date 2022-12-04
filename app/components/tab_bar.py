@@ -1,8 +1,9 @@
 """Generate and configure tab bar with URL bar and buttons"""
 
-from PySide2 import (
+from PySide6 import (
     QtWidgets as QtW,
-    QtWebEngineWidgets as QtWEW
+    QtWebEngineWidgets as QtWEW,
+    QtCore as QtC
 )
 
 
@@ -49,8 +50,10 @@ class UrlBar(QtW.QFrame):
     def __init_options(self):
         """Configure widgets with some options"""
 
-        self.layout().setMargin(4)
+        self.layout().setContentsMargins(4, 4, 4, 4)
         self.layout().setSpacing(4)
+        
+        self.setSizePolicy(QtW.QSizePolicy.Policy.Expanding, QtW.QSizePolicy.Policy.Fixed)
 
 
 class Tab(QtW.QFrame):
@@ -80,7 +83,7 @@ class Tab(QtW.QFrame):
 
     def __init_options(self):
         """Configure widgets with some options"""
-        self.layout().setMargin(0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
 
@@ -118,7 +121,7 @@ class TabBar(QtW.QFrame):
     def __init_options(self):
         """Configure widgets with some options"""
 
-        self.layout().setMargin(0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
         self.setStyleSheet(self.__stylesheet)
@@ -132,5 +135,6 @@ class TabBar(QtW.QFrame):
             icon (PySide2.QtGui.QIcon): icon to add to the tab title
             name (str): name of the new tab
         """
+        print(self.__tabbar.tabBar().expanding())
         idx = self.__tabbar.addTab(Tab(widget), name)
         self.__tabbar.tabBar().tabInserted(idx)

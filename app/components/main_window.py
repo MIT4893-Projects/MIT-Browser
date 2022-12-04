@@ -1,6 +1,6 @@
 """Generate and configure main window for browser"""
 
-from PySide2 import (
+from PySide6 import (
     QtWidgets as QtW
 )
 
@@ -36,5 +36,5 @@ class MainWindow(QtW.QMainWindow):
 
     def init_options(self):
         """Configure widgets with some options"""
-        self.centralWidget().layout().setMargin(0)
+        self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
         self.centralWidget().layout().setSpacing(0)

@@ -10,7 +10,7 @@ from components import (
     tab_bar,
     web_view
 )
-from PySide2 import (
+from PySide6 import (
     QtWidgets as QtW
 )
 

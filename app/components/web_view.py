@@ -1,6 +1,6 @@
 """Application's module to generate and configure webview for browser"""
 
-from PySide2 import (
+from PySide6 import (
     QtWebEngineWidgets as QtWEW,
     QtWidgets as QtW
 )
