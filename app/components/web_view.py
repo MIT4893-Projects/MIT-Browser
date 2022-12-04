@@ -2,7 +2,6 @@
 
 from PySide6 import (
     QtWebEngineWidgets as QtWEW,
-    QtWidgets as QtW
 )
 
 class WebView(QtWEW.QWebEngineView):

@@ -7,6 +7,7 @@ from PySide6 import (
 )
 
 
+
 class UrlBar(QtW.QFrame):
     """Create and modify url bar for tab bar
 
@@ -38,22 +39,41 @@ class UrlBar(QtW.QFrame):
 
         self.setLayout(QtW.QHBoxLayout())
 
-        for widget, position, name in (
-            (self.__button_back, 0, "btn-next"),
-            (self.__button_forward, 1, "btn-back"),
-            (self.__button_reload, 2, "btn-reload"),
-            (self.__urlbar, 3, "url-bar")
+        for widget, name in (
+            (self.__button_back, "btn-back"),
+            (self.__button_forward, "btn-forward"),
+            (self.__button_reload, "btn-reload"),
+            (self.__urlbar, "url-bar")
         ):
-            self.layout().addWidget(widget, position)
+            self.layout().addWidget(widget)
             widget.setObjectName(name)
+            widget.setStyleSheet(self.__stylesheet)
 
     def __init_options(self):
         """Configure widgets with some options"""
 
         self.layout().setContentsMargins(4, 4, 4, 4)
         self.layout().setSpacing(4)
-        
+
+        self.__urlbar.setTextMargins(10, 0, 10, 0)
+        self.__urlbar.editingFinished.connect(self.cursor_at_first)
+
         self.setSizePolicy(QtW.QSizePolicy.Policy.Expanding, QtW.QSizePolicy.Policy.Fixed)
+
+    def cursor_at_first(self):
+        """Place text cursor at first character of URL bar when unfocus it"""
+        self.__urlbar.setCursorPosition(0)
+
+    @property
+    def text(self):
+        """Get url bar's text"""
+        return self.__urlbar.text()
+
+    @text.setter
+    def text(self, url: str):
+        """Set url bar's text"""
+        self.__urlbar.setText(url)
+
 
 
 class Tab(QtW.QFrame):
@@ -64,12 +84,14 @@ class Tab(QtW.QFrame):
     """
 
     # Attrs:
+    __urlbar : UrlBar
     __webview : QtWEW.QWebEngineView
 
     def __init__(self, webview=QtWEW.QWebEngineView):
         super().__init__()
 
         self.__webview = webview
+        self.__urlbar = UrlBar()
 
         self.__init_ui()
         self.__init_options()
@@ -78,13 +100,25 @@ class Tab(QtW.QFrame):
         """Place widgets inside tab"""
         self.setLayout(QtW.QVBoxLayout())
 
-        self.layout().addWidget(UrlBar())
+        self.layout().addWidget(self.__urlbar)
         self.layout().addWidget(self.__webview)
 
     def __init_options(self):
         """Configure widgets with some options"""
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
+
+    def update_url_bar(self, event=None):
+        """Update url bar when url changed"""
+        if isinstance(event, QtC.QUrl):
+            self.__urlbar.text = event.url()
+            self.__urlbar.cursor_at_first()
+
+    @property
+    def webview(self):
+        """Private webview property getter"""
+        return self.__webview
+
 
 
 class TabBar(QtW.QFrame):
@@ -96,14 +130,14 @@ class TabBar(QtW.QFrame):
 
     # Attrs:
     __tabbar : QtW.QTabWidget
-    __stylesheet : str
+    __parent : QtW.QMainWindow
 
-    def __init__(self, stylesheet):
+    def __init__(self, parent):
         super().__init__()
 
         # Define attributes
         self.__tabbar = QtW.QTabWidget()
-        self.__stylesheet = stylesheet
+        self.__parent = parent
 
         # Configure object
         self.__init_ui()
@@ -124,9 +158,6 @@ class TabBar(QtW.QFrame):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
-        self.setStyleSheet(self.__stylesheet)
-        self.__tabbar.setStyleSheet(self.__stylesheet + "width: ")
-
     def add_tab(self, widget, name):
         """Add a new tab with widget and name
 
@@ -134,6 +165,19 @@ class TabBar(QtW.QFrame):
             widget (PySide6.QtWidgets.QWidget): widget to add to new tab
             name (str): name of the new tab
         """
-        print(self.__tabbar.tabBar().expanding())
-        idx = self.__tabbar.addTab(Tab(widget), name)
-        self.__tabbar.tabBar().tabInserted(idx)
+
+        tab = Tab(widget)
+        index = self.__tabbar.addTab(tab, name)
+        tab.webview.urlChanged.connect(tab.update_url_bar)
+        tab.webview.loadFinished.connect(lambda: self.update_tab_title(index))
+        tab.webview.iconChanged.connect(lambda: self.update_tab_icon(index))
+
+    def update_tab_title(self, index):
+        """Update tab title when page loaded"""
+        title = self.__tabbar.widget(index).webview.title()
+        self.__tabbar.tabBar().setTabText(index, title)
+        self.__parent.setWindowTitle(f"{title} - MIT")
+
+    def update_tab_icon(self, index):
+        """Update tab icon when page loaded icon"""
+        self.__tabbar.tabBar().setTabIcon(index, self.__tabbar.widget(index).webview.icon())

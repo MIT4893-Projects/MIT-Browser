@@ -1,24 +1,43 @@
-QTabWidget::pane {
-    border: 0;
-}
-
-QTabWidget::tab-bar {
+QMainWindow {
     background-color: #1E1D26;
 }
 
-#urlbar {
-    border: 1px solid #222;
-    border-radius: 15px;
-    font-size: 13px;
+QTabWidget::tab-bar {
+    left: 10px;
 }
 
-#btn-next, #btn-back, #btn-reload {
+QTabWidget::pane, QTabBar::tab {
+    border: 0;
+    background-color: #383646;
+    color: white;
+}
+
+QTabWidget QTabBar::tab {
+    padding: 7px;
+    font-family: "Helvetica", "Helvetica Neue", "Roboto", "Segoe UI", sans-serif;
+    font-size: 16px;
+    width: 200px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin-top: 5px;
+}
+
+#url-bar {
+    border: 1px solid #222;
+    border-radius: 10px;
+    font-size: 16px;
+    height: 32px;
+}
+
+#btn-forward, #btn-back, #btn-reload {
     background-color: white;
     border: 1px solid #222;
-    border-radius: 15px;
+    border-radius: 10px;
+    height: 30px;
+    width: 30px;
 }
 
-#btn-next {
+#btn-forward {
     qproperty-icon: url("./assets/icons/next-arrow.png");
 }
 

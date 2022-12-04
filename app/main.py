@@ -11,7 +11,8 @@ from components import (
     web_view
 )
 from PySide6 import (
-    QtWidgets as QtW
+    QtWidgets as QtW,
+    QtGui as QtG
 )
 
 
@@ -32,10 +33,11 @@ if __name__ == "__main__":
     app = QtW.QApplication()
     mw = main_window.MainWindow()
     mw.setStyleSheet(STYLESHEET)
+    icon = QtG.QIcon(QtG.QPixmap("./assets/icons/icon.png"))
+    mw.setWindowIcon(icon)
 
-    print(QtW.QTabBar().styleSheet())
-
-    tb = tab_bar.TabBar(STYLESHEET)
+    tb = tab_bar.TabBar(mw)
+    tb.setStyleSheet(STYLESHEET)
 
     wv = web_view.WebView()
     tb.add_tab(wv, "A long tab name")
@@ -43,4 +45,4 @@ if __name__ == "__main__":
     mw.add_widget(tb)
 
     mw.show()
-    app.exec_()
+    app.exec()
