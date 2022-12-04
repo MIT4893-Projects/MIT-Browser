@@ -8,7 +8,7 @@ class MainWindow(QtW.QMainWindow):
     """Create and modify main window
 
     Inherit:
-        PySide2.QtWidgets.QMainWindow
+        PySide6.QtWidgets.QMainWindow
     """
 
     # Attrs:
@@ -30,7 +30,7 @@ class MainWindow(QtW.QMainWindow):
         """Faster way to add widget
 
         Args:
-            widget (Pyside2.QtWidgets.QWidget): widget need to add to main window
+            widget (Pyside6.QtWidgets.QWidget): widget need to add to main window
         """
         self.centralWidget().layout().addWidget(widget)
 

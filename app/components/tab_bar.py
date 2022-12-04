@@ -11,7 +11,7 @@ class UrlBar(QtW.QFrame):
     """Create and modify url bar for tab bar
 
     Inherit:
-        Pyside2.QtWidgets.QFrame
+        Pyside6.QtWidgets.QFrame
     """
 
     # Attrs:
@@ -60,7 +60,7 @@ class Tab(QtW.QFrame):
     """Create and modify tab for tab bar
 
     Inherit:
-        Pyside2.QtWidgets.QFrame
+        Pyside6.QtWidgets.QFrame
     """
 
     # Attrs:
@@ -91,7 +91,7 @@ class TabBar(QtW.QFrame):
     """Create and modify tab bar
 
     Inherit:
-        Pyside2.QtWidgets.QFrame
+        Pyside6.QtWidgets.QFrame
     """
 
     # Attrs:
@@ -131,8 +131,7 @@ class TabBar(QtW.QFrame):
         """Add a new tab with widget and name
 
         Args:
-            widget (PySide2.QtWidgets.QWidget): widget to add to new tab
-            icon (PySide2.QtGui.QIcon): icon to add to the tab title
+            widget (PySide6.QtWidgets.QWidget): widget to add to new tab
             name (str): name of the new tab
         """
         print(self.__tabbar.tabBar().expanding())

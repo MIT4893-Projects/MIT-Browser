@@ -9,7 +9,7 @@ class WebView(QtWEW.QWebEngineView):
     """Create and modify web view (include HTML, CSS render and JS interpreter)
 
     Inherit:
-        PySide2.QtWebEngineWidgets.QWebEngineView
+        PySide6.QtWebEngineWidgets.QWebEngineView
     """
 
     # Attrs:
